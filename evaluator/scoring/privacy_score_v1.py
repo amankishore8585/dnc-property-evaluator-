@@ -29,7 +29,7 @@ def score_privacy_v1(extracted: dict):
     # PRIVACY IN ROOM (25%)
     # =====================================================
     in_room = extracted.get("privacy_in_room") or {}
-    in_room_score = 0.85
+    in_room_score = 0.75
 
     in_room_fields = [
         "room_size",
@@ -46,11 +46,26 @@ def score_privacy_v1(extracted: dict):
     if in_room.get("room_size") == "small":
         in_room_score -= 0.25
         concerns.append("Small bedroom size reduces personal privacy")
+    elif in_room.get("room_size") == "large":
+        in_room_score += 0.08
+        strengths.append("Spacious bedroom improves sense of personal privacy")
+    elif in_room.get("room_size") == "average":
+        strengths.append("Bedroom size is proportionate and suitable for privacy")
 
-    if in_room.get("ceiling_height_ft") is not None:
-        if in_room.get("ceiling_height_ft") <= 8:
-            in_room_score -= 0.15
-            concerns.append("Low ceiling height can feel more enclosed")
+
+    ceiling = in_room.get("ceiling_height_ft")
+
+    if ceiling is not None:
+        if ceiling < 8:
+            in_room_score -= 0.18
+            concerns.append("Low ceiling height reduces spatial comfort and privacy perception")
+
+        elif ceiling == 8:
+            strengths.append("Standard ceiling height provides acceptable privacy comfort")
+
+        elif ceiling >= 9:
+            in_room_score += 0.05
+            strengths.append("Higher ceiling improves sense of openness and privacy")
 
     
     if in_room.get("window_placement") == "door_wall":
@@ -58,6 +73,10 @@ def score_privacy_v1(extracted: dict):
         concerns.append(
             "Window on the same wall as the door reduces visual privacy"
         )
+    elif in_room.get("window_placement") == "away_from_door":
+        in_room_score += 0.05
+        strengths.append("Window positioned away from door improves visual privacy")
+    
 
     in_room_score = max(min(in_room_score, 1), 0)
 
@@ -98,60 +117,74 @@ def score_privacy_v1(extracted: dict):
             if between_rooms.get(field) is not None:
                 known_fields += 1
 
-        # ---- Shared wall penalty
-        if between_rooms.get("bedrooms_share_wall") is True:
-            between_rooms_score -= 0.35
+        # ---- Shared wall logic
+        share_wall = between_rooms.get("bedrooms_share_wall")
+
+        if share_wall is True:
+            between_rooms_score -= 0.25
             concerns.append(
                 "Bedrooms sharing a wall reduces acoustic privacy"
             )
 
-        # ---- Buffer bonus
+        elif share_wall is False:
+            between_rooms_score += 0.05
+            strengths.append(
+                "Bedrooms do not share walls, improving acoustic separation"
+            )
+
+
+        # ---- Buffer logic
         buffer = between_rooms.get("buffer_between_rooms")
 
-        
-        if buffer == "small_passage":
+        if buffer == "none":
+            between_rooms_score -= 0.18
+            concerns.append(
+                "No buffer between bedrooms allows direct sound and visual transfer"
+            )
+
+        elif buffer == "small_passage":
             between_rooms_score -= 0.05
             concerns.append(
                 "Only a small passage separates bedrooms, offering limited privacy buffering"
             )
 
-
         elif buffer == "large_lobby":
             between_rooms_score += 0.12
             strengths.append(
-                "Large lobby between bedrooms significantly improves privacy"
+            "Large lobby between bedrooms significantly improves privacy"
             )
 
         elif buffer == "big_hall":
-            between_rooms_score += 0.18
+            between_rooms_score += 0.15
             strengths.append(
-                "Big hall between bedrooms offers strong visual and acoustic privacy"
+            "Big hall between bedrooms offers strong visual and acoustic privacy"
             )
+
 
 
         # ---- Window proximity penalty
         window_relation = between_rooms.get("window_proximity_between_rooms")
 
         if window_relation == "close_facing_each_other":
-            between_rooms_score -= 0.25
+            between_rooms_score -= 0.32
             concerns.append(
                 "Bedroom windows close and facing each other allow sound and visual intrusion"
             )
 
         elif window_relation == "close_not_facing":
-            between_rooms_score -= 0.12
+            between_rooms_score -= 0.18
             concerns.append(
                 "Bedroom windows are close, which can still transmit sound"
             )
 
         elif window_relation == "far_apart_facing":
-            between_rooms_score -= 0.08
-            concerns.append(
-                "Bedroom windows face each other even though they are far apart"
+            between_rooms_score += 0.03
+            strengths.append(
+                "Bedroom windows face each other but are far apart, reducing intrusion"
             )
 
         elif window_relation == "far_apart_not_facing":
-            between_rooms_score += 0.05
+            between_rooms_score += 0.06
             strengths.append(
                 "Bedroom windows are well separated and not facing each other"
             )
@@ -163,7 +196,7 @@ def score_privacy_v1(extracted: dict):
     # PRIVACY BETWEEN UNITS (45%)
     # =====================================================
     between_units = extracted.get("privacy_between_units") or {}
-    between_units_score = 0.75
+    between_units_score = 0.72
     attachment_details = extracted.get("attachment_details", {})
 
 
@@ -185,14 +218,25 @@ def score_privacy_v1(extracted: dict):
         if between_units.get(field) is not None:
             known_fields += 1
 
-    unit_bonus = 0.0
-    structural_penalty = 0.0
-
     # ---- Apartment baseline penalty
-    if between_units.get("unit_type") == "apartment":
+    unit_type = between_units.get("unit_type")
+
+    if unit_type == "apartment":
         between_units_score -= 0.05
         concerns.append(
             "Shared apartment living slightly reduces overall privacy"
+        )
+
+    elif unit_type == "independent_house":
+        between_units_score += 0.08
+        strengths.append(
+            "Independent house structure improves structural privacy separation"
+        )
+
+    elif unit_type == "row_house":
+        between_units_score += 0.03
+        strengths.append(
+            "Row house layout offers better separation than apartments"
         )
 
     # ---- Front open space
@@ -204,7 +248,7 @@ def score_privacy_v1(extracted: dict):
 
 
     elif front in ["tight_service_gap", "narrow_gap"]:
-        structural_penalty += 0.15
+        between_units_score -= 0.15
         concerns.append(
             "Very narrow front gap provides limited privacy buffer"
         )
@@ -216,13 +260,13 @@ def score_privacy_v1(extracted: dict):
         )
 
     elif front == "wide_road":
-        unit_bonus += 0.03
+        between_units_score += 0.03
         strengths.append(
-            "Wide road in front provides some separation"
+            "Wide road in front provides separation"
         )
 
     elif front == "front_yard":
-        unit_bonus += 0.06
+        between_units_score += 0.06
         strengths.append(
             "Front yard provides a visual buffer from the street"
         )
@@ -230,23 +274,25 @@ def score_privacy_v1(extracted: dict):
 
     def side_penalty(side_key, side_value, attachment_details):
 
-        # Attached → inspect ownership
         if side_value == "attached":
             return 0.0, None
-
 
         if side_value in ["tight_service_gap", "narrow_gap"]:
             return 0.12, "Very narrow side gap provides limited privacy"
 
-        if side_value in ["side_alley", "narrow_road","small_side_yard"]:
-            return -0.02, None
+        if side_value in ["side_alley", "narrow_road", "small_side_yard"]:
+            return 0.05, "Limited side clearance reduces lateral privacy"
 
-        if side_value in ["side_road", "large_side_yard"]:
-            return -0.06, None
+        if side_value in ["side_road"]:
+            return -0.03, "Side road provides moderate separation"
+
+        if side_value in ["large_side_yard"]:
+            return -0.06, "Large side yard significantly improves lateral privacy"
 
         return 0.0, None
 
-    
+
+    #----side open space
     side1 = between_units.get("side_a_open_space")
     side2 = between_units.get("side_b_open_space")
 
@@ -255,17 +301,15 @@ def score_privacy_v1(extracted: dict):
     side_penalty("side_b", side2, attachment_details),
     ]
 
-    penalties = [r[0] for r in side_results]
-    messages = [r[1] for r in side_results if r[1]]
-
-    worst_penalty = max(penalties)
-
-    if worst_penalty > 0:
-        structural_penalty += worst_penalty
-        concerns.append(messages[penalties.index(worst_penalty)])
-    elif worst_penalty < 0:
-        between_units_score += abs(worst_penalty)
-        strengths.append("Good side open space improves lateral privacy")
+    for penalty, message in side_results:
+        if penalty > 0:
+            between_units_score -= penalty
+            if message:
+                concerns.append(message)
+        elif penalty < 0:
+            between_units_score += abs(penalty)
+            if message:
+                strengths.append(message)
 
 
     # ---- Back open space (STRUCTURAL)
@@ -276,7 +320,7 @@ def score_privacy_v1(extracted: dict):
 
 
     elif back in ["tight_service_gap", "narrow_gap"]:
-        structural_penalty += 0.15
+        between_units_score -= 0.15
         concerns.append(
             "Very narrow rear gap provides limited privacy buffer"
         )
@@ -294,14 +338,14 @@ def score_privacy_v1(extracted: dict):
         )
 
     elif back == "private_backyard":
-        unit_bonus += 0.10
+        between_units_score += 0.10
         strengths.append(
             "Private backyard significantly improves rear privacy"
         )
 
     # ---- Gated society
     if between_units.get("is_in_gated_society") is True:
-        unit_bonus += 0.07
+        between_units_score += 0.07
         strengths.append(
             "Gated society improves privacy through controlled access"
         )
@@ -309,12 +353,12 @@ def score_privacy_v1(extracted: dict):
     # ---- Surrounding layout
     layout = between_units.get("surrounding_layout_uniformity")
     if layout == "uniform_layout":
-        unit_bonus += 0.05
+        between_units_score += 0.05
         strengths.append(
             "Uniform surrounding layout reduces visual and noise intrusion"
         )
     elif layout == "mostly_uniform":
-        unit_bonus += 0.02
+        between_units_score += 0.02
         strengths.append(
             "Mostly uniform surrounding layout offers consistency"
         )
@@ -330,60 +374,55 @@ def score_privacy_v1(extracted: dict):
             "Irregular surrounding layout can increase privacy intrusion"
         )
 
-    # ---- Apartment door spacing
-    if between_units.get("unit_type") == "apartment":
-        door_distance = between_units.get("distance_between_apartment_doors")
-        if door_distance == "very_close":
-            structural_penalty += 0.10
-            concerns.append(
-                "Very close apartment doors reduce corridor privacy"
-            )
-        elif door_distance == "moderate":
-            between_units_score -= 0.03
-            concerns.append(
-                "Moderate distance between apartment doors limits separation"
-            )
-        elif door_distance == "far_apart":
-            unit_bonus += 0.05
-            strengths.append(
-                "Greater distance between apartment doors improves privacy"
-            )
+    # --- door spacing
 
-    # ---- Apartment entry buffer (NEW)
-    if between_units.get("unit_type") == "apartment":
-        entry = between_units.get("apartment_entry_buffer")
+    door_distance = between_units.get("distance_between_apartment_doors")
+    if door_distance == "very_close":
+        between_units_score -= 0.10
+        concerns.append(
+            "Very close entrance doors reduce separation"
+        )
+    elif door_distance == "moderate":
+        between_units_score -= 0.03
+        concerns.append(
+            "Moderate distance between entrance doors limits separation"
+        )
+    elif door_distance == "far_apart":
+        between_units_score += 0.05
+        strengths.append(
+            "Greater distance between apartment doors improves privacy"
+        )
 
-        if entry == "direct_to_room":
-            structural_penalty += 0.22
-            concerns.append(
-                "Apartment entrance opening directly into a private room severely compromises privacy"
-            )
+    # ---- entry buffer (NEW)
+    entry = between_units.get("apartment_entry_buffer")
 
-        elif entry == "foyer_to_room":
-            structural_penalty += 0.14
-            concerns.append(
-                "Small foyer before a private room provides limited privacy buffer"
-            )
+    if entry == "direct_to_room":
+        between_units_score -= 0.22
+        concerns.append(
+            "Entrance opening directly into a private room severely compromises privacy"
+        )
 
-        elif entry == "direct_to_hall":
-            unit_bonus += 0.03
-            strengths.append(
-                "Apartment entrance opening into the hall avoids direct exposure of private rooms"
-            )
+    elif entry == "foyer_to_room":
+        between_units_score -= 0.14
+        concerns.append(
+            "Small foyer before a private room provides limited privacy buffer"
+        )
 
-        elif entry == "foyer_to_hall":
-            unit_bonus += 0.08
-            strengths.append(
-                "Foyer separating entrance from living areas strongly improves privacy from common corridors"
-            )
+    elif entry == "direct_to_hall":
+        between_units_score += 0.03
+        strengths.append(
+            "Entrance opening into the hall avoids direct exposure of private rooms"
+        )
 
+    elif entry == "foyer_to_hall":
+        between_units_score += 0.08
+        strengths.append(
+            "Foyer separating entrance from living areas strongly improves privacy from common corridors"
+        )
 
-    # ---- Cap bonuses & apply structural penalties
-    between_units_score += min(unit_bonus, 0.12)
-    between_units_score -= structural_penalty
     between_units_score = max(min(between_units_score, 1), 0)
 
-
+    #attachment
     for side, info in attachment_details.items():
         owner = info.get("owner")
         space_type = info.get("space_type")
@@ -422,6 +461,9 @@ def score_privacy_v1(extracted: dict):
 
         elif front == "wide_road":
             between_units_score += 0.02
+            strengths.append(
+            "Front-facing window benefits from a wider road providing some separation"
+            )
 
         elif front == "narrow_road":
             between_units_score -= 0.14
@@ -448,6 +490,7 @@ def score_privacy_v1(extracted: dict):
 
         elif back == "back_road":
             between_units_score += 0.02
+            strengths.append("Back window facing a wider road creates seperation")
 
         elif back == "private_backyard":
             between_units_score += 0.08
@@ -472,16 +515,16 @@ def score_privacy_v1(extracted: dict):
             return 0.0
 
         # ---- Normal open-space logic
-        if side_value in ["side_yard", "large_side_yard", "side_road"]:
+        if side_value in ["large_side_yard", "side_road"]:
             return 0.06
 
-        elif side_value in ["side_alley", "narrow_road", "small_side_yard"]:
+        elif side_value in ["small_side_yard"]:
             return -0.05
 
-        elif side_value == "narrow_gap":
+        elif side_value in ["side_alley","narrow_road"]:
             return -0.14
 
-        elif side_value in ["tight_service_gap"]:
+        elif side_value in ["tight_service_gap","narrow_gap"]:
             return -0.18
 
         return 0.0

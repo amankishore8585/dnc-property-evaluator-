@@ -64,7 +64,7 @@ FIELD_QUESTIONS = {
     # Between units
     "unit_type": "Is this an apartment or an independent house?",
     "front_open_space": (
-        "What is in front of the room of the home? "
+        "What is in front of the room(primary bedroom)? "
     "For example:\n"
     "- Attached to neighbouring unit or to other bedroom.\n"
     "- Narrow gap or tight space between buildings\n"
@@ -73,7 +73,7 @@ FIELD_QUESTIONS = {
     "- A Front Yard\n"
     ),
     "side_a_open_space": (
-        "What is along the one side of the room of the home?\n"
+        "What is along the one side(Side A) of the room(primary)?\n"
     "For example:\n"
     "- Attached to neighbouring unit or to other bedroom.\n"
     "- Narrow gap or tight space between buildings\n"
@@ -82,8 +82,9 @@ FIELD_QUESTIONS = {
     "- A private side yard\n"
     ),
     "side_b_open_space":(
-        "What is on the other side of the room?\n"
-    "For example: Attached to another unit\n"
+        "What is on the other side(Side B) of the room?\n"
+    "For example:\n" 
+    "- Attached to another unit\n"
     "- Narrow gap or tight space between buildings\n"
     "- A side alley or narrow road or a small side yard on side\n"
     "- A road along the side\n"
@@ -91,7 +92,7 @@ FIELD_QUESTIONS = {
     ),
 
     "back_open_space": (
-        "What is behind the room of the home?\n"
+        "What is behind the room(primary)?\n"
     "- No space / attached to neighbouring unit from behind.\n"
     "- Narrow gap or tight space behind\n"
     "- A back alley or narrow road behind \n"
@@ -106,16 +107,16 @@ FIELD_QUESTIONS = {
         "Do nearby homes follow a similar layout,mostly uniform or is the layout mixed and irregular?"
     ),
     "distance_between_apartment_doors": (
-        "How close are neighboring apartment/house doors on the same floor?/street if for houses "
+        "How close are neighboring apartment/house doors on the same floor/street "
         "(very close, moderate, or far apart)"
     ),
     "apartment_entry_buffer": (
         "When you enter the apartment/house, what is the sequence of spaces?\n"
     "For example:\n"
-    "- Door opens directly into a bedroom or private room\n"
+    "- Door opens directly into a room(primary)\n"
     "- Door opens directly into the living/drawing hall\n"
-    "- Door opens into a small foyer/lobby, then into a room\n"
-    "- Door opens into a foyer/lobby, then into the hall\n"
+    "- Door opens into a small foyer/lobby(indoors lobby), then into a room(primary)\n"
+    "- Door opens into a foyer/lobby, then into the hall/living room\n"
     
     ),
     
@@ -125,7 +126,7 @@ FIELD_QUESTIONS = {
         "(For example: 1 BHK / studio → no, 2+ bedrooms → yes)"
     ),
     "bedrooms_share_wall": (
-        "Do any of the bedrooms share a wall with another room?"
+        "Do any of the bedroom(primary) share a wall with another bedroom(secondary?"
     ),
     "buffer_between_rooms": (
         "Is there a buffer space between the bedrooms?\n"
@@ -135,7 +136,7 @@ FIELD_QUESTIONS = {
     "- A big hall or living area"
     ),
     "window_proximity_between_rooms": (
-        "How are the bedroom windows positioned relative to each other?\n"
+        "How are the bedroom(primary and secondary) windows positioned relative to each other?\n"
     "- Very close and facing each other\n"
     "- Close but not facing each other\n"
     "- Far apart but facing each other\n"
@@ -144,9 +145,9 @@ FIELD_QUESTIONS = {
 
     # In room
     "room_size": "Is the bedroom small, average, or large?",
-    "ceiling_height_ft": "What is the approximate ceiling height (average-8 or 9ft or small- less than 8)?",
+    "ceiling_height_ft": "What is the approximate ceiling height (average-8 or large-9ft or small-less than 8)?",
     "window_placement": (
-        "Is the window on the same wall as the door, or away from it?"
+        "Is the window on the same wall as the bedroom(primary) door, or away from it?"
     ),
     "window_facing_side":(
         "Which side does the bedroom window face-front,side or back?"

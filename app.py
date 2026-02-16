@@ -66,11 +66,11 @@ def chatbot():
             {
                 "role": "assistant",
                 "content": (
-                    "👋 Hi! I’m a property evaluator.In early access I try to evaluate privacy of a primary room with respect to its own unit(secondary rooms) and and neighbours unit .\n\n"
+                    "👋 Hi! I’m a property evaluator.PLEASE NOTE-In early access I try to evaluate privacy of a primary room(bedroom) with respect to other rooms in your property(internal) and with respect to neighbours unit and society layout(external).\n\n"
                     
                     "Describe the property you want to evaluate.\n"
                     "You can start with layout (is it an apartment or villa), surroundings "
-                    "(is the property on gated society or not?), or ask about any real estate topic.\n\n"
+                    "(is the property in gated society or not?), or ask about any real estate topic.\n\n"
                     "If you are confused just type -'how does it work?"
 
                 )
