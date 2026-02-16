@@ -1,0 +1,169 @@
+{
+  "name": "extract_privacy_attributes",
+  "description": "Extract structured privacy-related attributes of a residential property.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+
+      "privacy_in_room": {
+        "type": ["object", "null"],
+        "properties": {
+          "room_size": {
+            "type": ["string", "null"],
+            "enum": ["small", "average", "large"],
+            "description": "Relative size of the bedroom."
+          },
+          "ceiling_height_ft": {
+            "type": ["number", "null"],
+            "description": "Approximate ceiling height in feet."
+          },
+          "window_placement": {
+            "type": ["string", "null"],
+            "enum": ["door_wall", "away_from_door"],
+            "description": "Whether the window is on the same wall as the door or away from it."
+          },
+          "window_facing_side": {
+            "type": ["string", "null"],
+            "enum": ["front", "side", "back"],
+            "description": "Which side the bedroom window faces."
+          }
+        }
+      },
+
+      "privacy_between_rooms": {
+        "type": ["object", "null"],
+        "properties": {
+          "has_multiple_bedrooms": {
+            "type": ["boolean", "null"],
+            "description": "Whether there is more than one bedroom on the evaluated floor."
+          },
+          "bedrooms_share_wall": {
+            "type": ["boolean", "null"],
+            "description": "Whether bedrooms share a wall."
+          },
+          "buffer_between_rooms": {
+            "type": ["string", "null"],
+            "enum": ["none", "small_passage", "large_lobby", "big_hall"],
+            "description": "Scale of buffer space separating bedrooms."
+          },
+          "window_proximity_between_rooms": {
+            "type": ["string", "null"],
+            "enum": [
+              "close_facing_each_other",
+              "close_not_facing",
+              "far_apart_not_facing",
+              "far_apart_facing"
+            ],
+            "description": "Proximity and orientation of windows between rooms."
+          }
+        }
+      },
+
+      "privacy_between_units": {
+        "type": ["object", "null"],
+        "properties": {
+
+          "unit_type": {
+            "type": ["string", "null"],
+            "enum": ["apartment", "independent_house", "row_house"],
+            "description": "Type of residential unit."
+          },
+
+          "front_open_space": {
+            "type": ["string", "null"],
+            "enum": [
+              "attached",
+              "tight_service_gap",
+              "narrow_gap",
+              "narrow_road",
+              "wide_road",
+              "front_yard"
+            ],
+            "description": "Nature of open space in front of the bedroom."
+          },
+
+          "side_a_open_space": {
+            "type": ["string", "null"],
+            "enum": [
+              "attached",
+              "tight_service_gap",
+              "narrow_gap",
+              "side_alley",
+              "small_side_yard",
+              "narrow_road",
+              "side_road",
+              "large_side_yard"
+            ],
+            "description": "Open space or adjacency on one side of the bedroom."
+          },
+
+          "side_b_open_space": {
+            "type": ["string", "null"],
+            "enum": [
+              "attached",
+              "tight_service_gap",
+              "narrow_gap",
+              "side_alley",
+              "small_side_yard",
+              "narrow_road",
+              "side_road",
+              "large_side_yard"
+            ],
+            "description": "Open space or adjacency on the other side of the bedroom."
+          },
+
+          "back_open_space": {
+            "type": ["string", "null"],
+            "enum": [
+              "none",
+              "attached",
+              "tight_service_gap",
+              "narrow_gap",
+              "back_alley",
+              "narrow_road",
+              "back_road",
+              "private_backyard"
+            ],
+            "description": "Open space behind the bedroom."
+          },
+
+          "is_in_gated_society": {
+            "type": ["boolean", "null"],
+            "description": "Whether the property is inside a gated or access-controlled society."
+          },
+
+          "surrounding_layout_uniformity": {
+            "type": ["string", "null"],
+            "enum": [
+              "uniform_layout",
+              "mostly_uniform",
+              "mixed_layout",
+              "irregular_layout"
+            ],
+            "description": "Whether nearby homes follow similar layouts or vary significantly."
+          },
+
+          "distance_between_apartment_doors": {
+            "type": ["string", "null"],
+            "enum": ["very_close", "moderate", "far_apart"],
+            "description": "How close neighboring apartment doors are on the same floor."
+          },
+
+          "apartment_entry_buffer": {
+            "type": ["string", "null"],
+            "enum": [
+              "direct_to_room",
+              "direct_to_hall",
+              "foyer_to_room",
+              "foyer_to_hall"
+            ],
+            "description": "Sequence of spaces immediately after apartment entrance."
+          }
+
+        }
+      }
+    }
+  }
+}
+
+

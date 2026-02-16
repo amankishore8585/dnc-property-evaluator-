@@ -1,0 +1,229 @@
+<!doctype html>
+<html>
+<head>
+    <title>DNC Property Evaluator</title>
+
+    <!-- IMPORTANT FOR MOBILE -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            background-color: #0f1115;
+            color: #e6e6e6;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 720px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        h2 {
+            margin: 0 0 16px 0;
+            font-size: 20px;
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+            border-radius: 14px;
+            line-height: 1.5;
+            font-size: 15px;
+            white-space: pre-line;
+            word-wrap: break-word;
+        }
+
+        .assistant {
+            background-color: #1a1d24;
+            align-self: flex-start;
+        }
+
+        .user {
+            background-color: #2f6fed;
+            color: white;
+            align-self: flex-end;
+        }
+
+        .typing {
+            font-size: 13px;
+            opacity: 0.7;
+            margin-bottom: 8px;
+        }
+
+        form {
+            position: sticky;
+            bottom: 0;
+            background-color: #0f1115;
+            padding-top: 8px;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 8px;
+        }
+
+        textarea {
+            flex: 1;
+            resize: none;
+            background-color: #12141a;
+            color: #e6e6e6;
+            border: 1px solid #2a2d36;
+            border-radius: 10px;
+            padding: 10px;
+            font-family: inherit;
+            font-size: 16px; /* Prevent mobile zoom */
+        }
+
+        button {
+            background-color: #2f6fed;
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        button:hover {
+            background-color: #2558c9;
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 600px) {
+
+            .container {
+                padding: 12px;
+            }
+
+            h2 {
+                font-size: 18px;
+            }
+
+            .message {
+                max-width: 90%;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>DNC Property Evaluator (Early Access)</h2>
+
+    <div class="chat-container" id="chat">
+        {% for msg in messages %}
+            <div class="message {{ msg.role }}">
+                {{ msg.content }}
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="typing" id="typing" style="display:none;">
+        Assistant is analyzing...
+    </div>
+
+    <form method="POST">
+        <div class="input-area">
+            <textarea name="message" rows="2" placeholder="Type your answer..." required></textarea>
+            <button type="submit">Send</button>
+        </div>
+    </form>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const form = document.querySelector("form");
+    const textarea = document.querySelector("textarea");
+    const chat = document.getElementById("chat");
+    const typing = document.getElementById("typing");
+
+    textarea.focus();
+
+    function scrollToBottom() {
+        chat.scrollTop = chat.scrollHeight;
+    }
+
+    scrollToBottom();
+
+    form.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const message = textarea.value.trim();
+        if (!message) return;
+
+        // Show user message instantly
+        const userDiv = document.createElement("div");
+        userDiv.className = "message user";
+        userDiv.textContent = message;
+        chat.appendChild(userDiv);
+
+        textarea.value = "";
+        typing.style.display = "block";
+        scrollToBottom();
+
+        fetch("/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-Requested-With": "XMLHttpRequest"
+            },
+            body: new URLSearchParams({ message: message })
+        })
+        .then(response => response.json())
+        .then(data => {
+
+            typing.style.display = "none";
+
+            // 🔥 If backend says redirect (scoring finished)
+            if (data.redirect) {
+                window.location.href = data.redirect;
+                return;
+            }
+
+            // Otherwise normal chat update
+            chat.innerHTML = "";
+
+            data.messages.forEach(msg => {
+                const div = document.createElement("div");
+                div.className = "message " + msg.role;
+                div.textContent = msg.content;
+                chat.appendChild(div);
+            });
+
+            scrollToBottom();
+            textarea.focus();
+        })
+
+        .catch(err => {
+            typing.style.display = "none";
+            console.error(err);
+        });
+    });
+
+});
+</script>
+
+
+</body>
+</html>
