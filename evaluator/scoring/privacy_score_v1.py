@@ -29,7 +29,7 @@ def score_privacy_v1(extracted: dict):
     # PRIVACY IN ROOM (25%)
     # =====================================================
     in_room = extracted.get("privacy_in_room") or {}
-    in_room_score = 0.75
+    in_room_score = 0.65
 
     in_room_fields = [
         "room_size",
@@ -196,7 +196,7 @@ def score_privacy_v1(extracted: dict):
     # PRIVACY BETWEEN UNITS (45%)
     # =====================================================
     between_units = extracted.get("privacy_between_units") or {}
-    between_units_score = 0.72
+    between_units_score = 0.65
     attachment_details = extracted.get("attachment_details", {})
 
 
@@ -222,7 +222,7 @@ def score_privacy_v1(extracted: dict):
     unit_type = between_units.get("unit_type")
 
     if unit_type == "apartment":
-        between_units_score -= 0.05
+        between_units_score -= 0.12
         concerns.append(
             "Shared apartment living slightly reduces overall privacy"
         )
