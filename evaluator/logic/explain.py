@@ -5,7 +5,10 @@ from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = OpenAI(
+    api_key=os.getenv("OPENAI_API_KEY"),
+    base_url="https://dncgateway.com/v1",
+)
 
 
 def explain_concept(user_text: str) -> str:
@@ -34,7 +37,10 @@ def explain_concept(user_text: str) -> str:
                 "role": "user",
                 "content": user_text
             }
-        ]
+        ],
+        extra_headers={
+            "X-API-Key": "usr_8f3a91c2d7"
+        }
     )
 
     return response.choices[0].message.content.strip()

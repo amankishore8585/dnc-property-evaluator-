@@ -5,7 +5,10 @@ from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = OpenAI(
+    api_key=os.getenv("OPENAI_API_KEY"),
+    base_url="https://dncgateway.com/v1",
+)
 
 
 def classify_with_llm(user_text: str) -> str:
@@ -38,7 +41,10 @@ def classify_with_llm(user_text: str) -> str:
                 "content": user_text
             }
         ],
-        temperature=0
+        temperature=0,
+        extra_headers={
+            "X-API-Key": "usr_8f3a91c2d7"
+        }
     )
 
     label = response.choices[0].message.content.strip().upper()
