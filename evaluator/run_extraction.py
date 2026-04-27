@@ -250,6 +250,7 @@ def extract_attachment_info(text: str) -> dict:
         extra_headers={
             "X-API-Key": "usr_8f3a91c2d7",
             "X-App-Id": "dnc-property-evaluator",
+            "Accept-Encoding": "identity",
             # optional for now:
             # "X-User-Id": "aman"
         }

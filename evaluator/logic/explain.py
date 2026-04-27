@@ -41,6 +41,7 @@ def explain_concept(user_text: str) -> str:
         extra_headers={
             "X-API-Key": "usr_8f3a91c2d7",
             "X-App-Id": "dnc-property-evaluator",
+            "Accept-Encoding": "identity",
             # optional for now:
             # "X-User-Id": "aman"
         }
