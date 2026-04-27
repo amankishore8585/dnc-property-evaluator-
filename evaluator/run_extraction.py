@@ -248,7 +248,10 @@ def extract_attachment_info(text: str) -> dict:
         ],
         response_format={ "type": "json_object" },
         extra_headers={
-            "X-API-Key": "usr_8f3a91c2d7"
+            "X-API-Key": "usr_8f3a91c2d7",
+            "X-App-Id": "dnc-property-evaluator",
+            # optional for now:
+            # "X-User-Id": "aman"
         }
     )
 
@@ -325,7 +328,10 @@ def run_extraction(text: str, context: dict | None = None) -> dict:
         functions=[privacy_schema],
         function_call={"name": privacy_schema["name"]},
         extra_headers={
-            "X-API-Key": "usr_8f3a91c2d7"
+            "X-API-Key": "usr_8f3a91c2d7",
+            "X-App-Id": "dnc-property-evaluator",
+            # optional for now:
+            # "X-User-Id": "aman"
         }
     )
 
